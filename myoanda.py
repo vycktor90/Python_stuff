@@ -28,8 +28,11 @@ OandaSymbol = {
 }
 def get_historical_data(symbol, endingDate="2015-01-01", tokenValue="3a70a46cbc2becd81f8e560c74768220-d81de0cee8049c3a80a2391d55a9a819"):
     import requests
-    import rfc3339
-    from datetime import datetime
+    #import rfc3339
+    import datetime
+
+
+
 
     print "getting data for {}".format(symbol)
     
@@ -54,7 +57,7 @@ def get_historical_data(symbol, endingDate="2015-01-01", tokenValue="3a70a46cbc2
                 url = "https://" + server + "/v1/candles?instrument=" + OandaSymbol[symbol] + "&count=5000&granularity=M1"
             else:                          
                 url = "https://" + server + "/v1/candles?instrument=" + OandaSymbol[symbol] + "&count=5000&granularity=M1&end=" + date.strftime("%Y-%m-%d")
-            print "before try"
+
           
             try:
                 req = requests.get(url, headers = headers)
@@ -62,7 +65,7 @@ def get_historical_data(symbol, endingDate="2015-01-01", tokenValue="3a70a46cbc2
                 resp = req.json()
                 
             except Exception as e:
-                print "failed there"
+                print "Request failure"
                 print e
            
                 print "ERROR"
@@ -78,32 +81,32 @@ def get_historical_data(symbol, endingDate="2015-01-01", tokenValue="3a70a46cbc2
             ratesClose = []
             ratesVolume = []
 
-            i = 0
+            #i = 0
             
-            for candle in reversed(candles):
-                print "1"
-                try:
-                    print candle['time']
-                    timestamp =candle['time']   #int(rfc3339.FromTimestamp(candle['time']))
-                    print "1.1"
-                    correctedTimeStamp = timezone('UTC').localize(datetime.datetime.utcfromtimestamp(timestamp))
-                    print "1.2"
-                    correctedTimeStamp = correctedTimeStamp.astimezone(timezone('Europe/Madrid'))
-                except Exception as e:
-                    print e
+            #for candle in reversed(candles):
+             #   print "1"
+            #    try:
+              #      print candle['time']
+              #      timestamp =candle['time']   #int(rfc3339.FromTimestamp(candle['time']))
+               #     print "1.1"
+          #          correctedTimeStamp = timezone('UTC').localize(datetime.datetime.utcfromtimestamp(timestamp))
+          #          print "1.2"
+         #           correctedTimeStamp = correctedTimeStamp.astimezone(timezone('Europe/Madrid'))
+         #       except Exception as e:
+         #           print e
                 
                 
-                if (correctedTimeStamp.isoweekday() < 6):
+         #       if (correctedTimeStamp.isoweekday() < 6):
                         
-                    ratesTime.append(datetime.datetime.utcfromtimestamp((int(calendar.timegm(correctedTimeStamp.timetuple())))))
-                    ratesOpen.append(float(candle['openBid']))
-                    ratesHigh.append(float(candle['highBid']))
-                    ratesLow.append(float(candle['lowBid']))
-                    ratesClose.append(float(candle['closeBid']))
-                    ratesVolume.append(float(candle['volume']))
-                    lastCandleTime = candle['time']
-                    i += 1
-            print "2"
+           #         ratesTime.append(datetime.datetime.utcfromtimestamp((int(calendar.timegm(correctedTimeStamp.timetuple())))))
+            ratesOpen.append(float(candle['openBid']))
+            ratesHigh.append(float(candle['highBid']))
+            ratesLow.append(float(candle['lowBid']))
+            ratesClose.append(float(candle['closeBid']))
+            ratesVolume.append(float(candle['volume']))
+            lastCandleTime = candle['time']
+          #         i += 1
+          #  print "2"
             ratesFromServer = {"1_Open": ratesOpen,
                                "2_High": ratesHigh,
                                "3_Low": ratesLow,
@@ -123,8 +126,8 @@ def get_historical_data(symbol, endingDate="2015-01-01", tokenValue="3a70a46cbc2
             print "{}, {}".format(finalRates.index[0], lastCandleTime)
                        
             j += 1
-        except:
+        except Exception as e:
+	    print e
             break
             
     finalRates.to_csv("OANDA_"+symbol + '_1.csv', date_format='%d/%m/%y %H:%M', header = False) 
-    
